@@ -31,7 +31,7 @@ local attribute [instance] classical.prop_decidable
 
 end 
 
-meta def normalize_hyps : tactic unit :=
+meta def normalize : tactic unit :=
 `[ try { simp only
    [ not_or_distrib,
      not_and_distrib,
@@ -72,73 +72,73 @@ do l ← local_context,
    cases e,
    skip
 
-meta def go_by_contradiction : tactic unit :=
+meta def proof_by_contradiction : tactic unit :=
 do refine ``(classical.by_contradiction _),
    intro `_,
    skip
 
-meta def prop_prover_aux : tactic unit :=
+meta def tab_aux : tactic unit :=
 do split_conjs,
    contradiction <|>
-     (split_disj >> prop_prover_aux >> prop_prover_aux)
+     (split_disj >> tab_aux >> tab_aux)
 
-meta def prop_prover : tactic unit :=
-do go_by_contradiction,
-   normalize_hyps,
-   prop_prover_aux
+meta def tab : tactic unit :=
+do proof_by_contradiction,
+   normalize,
+   tab_aux
 
-example : a ∧ b → b ∧ a := by prop_prover
-example : a ∧ (a → b) → b := by prop_prover
+example : a ∧ b → b ∧ a := by tab
+example : a ∧ (a → b) → b := by tab
 
 -- commutativity of ∧ and ∨
-example : p ∧ q ↔ q ∧ p := by prop_prover
-example : p ∨ q ↔ q ∨ p := by prop_prover
+example : p ∧ q ↔ q ∧ p := by tab
+example : p ∨ q ↔ q ∨ p := by tab
 
 -- associativity of ∧ and ∨
-example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := by prop_prover
-example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := by prop_prover
+example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := by tab
+example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := by tab
 
 -- distributivity
-example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by prop_prover
-example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := by prop_prover
+example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by tab
+example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := by tab
 
 -- other properties
-example : (p → (q → r)) ↔ (p ∧ q → r) := by prop_prover
-example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := by prop_prover
-example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := by prop_prover
-example : ¬p ∨ ¬q → ¬(p ∧ q) := by prop_prover
-example : ¬(p ∧ ¬p) := by prop_prover
-example : p ∧ ¬q → ¬(p → q) := by prop_prover
-example : ¬p → (p → q) := by prop_prover
-example : (¬p ∨ q) → (p → q) := by prop_prover
-example : p ∨ false ↔ p := by prop_prover
-example : p ∧ false ↔ false := by prop_prover
-example : ¬(p ↔ ¬p) := by prop_prover
-example : (p → q) → (¬q → ¬p) := by prop_prover
+example : (p → (q → r)) ↔ (p ∧ q → r) := by tab
+example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := by tab
+example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := by tab
+example : ¬p ∨ ¬q → ¬(p ∧ q) := by tab
+example : ¬(p ∧ ¬p) := by tab
+example : p ∧ ¬q → ¬(p → q) := by tab
+example : ¬p → (p → q) := by tab
+example : (¬p ∨ q) → (p → q) := by tab
+example : p ∨ false ↔ p := by tab
+example : p ∧ false ↔ false := by tab
+example : ¬(p ↔ ¬p) := by tab
+example : (p → q) → (¬q → ¬p) := by tab
 
-example : (p → r ∨ s) → ((p → r) ∨ (p → s)) := by prop_prover
-example : ¬(p ∧ q) → ¬p ∨ ¬q := by prop_prover
-example : ¬(p → q) → p ∧ ¬q := by prop_prover
-example : (p → q) → (¬p ∨ q) := by prop_prover
-example : (¬q → ¬p) → (p → q) := by prop_prover
-example : p ∨ ¬p := by prop_prover
-example : (((p → q) → p) → p) := by prop_prover
+example : (p → r ∨ s) → ((p → r) ∨ (p → s)) := by tab
+example : ¬(p ∧ q) → ¬p ∨ ¬q := by tab
+example : ¬(p → q) → p ∧ ¬q := by tab
+example : (p → q) → (¬p ∨ q) := by tab
+example : (¬q → ¬p) → (p → q) := by tab
+example : p ∨ ¬p := by tab
+example : (((p → q) → p) → p) := by tab
 
 example (h₁ : a ∧ b) (h₂ : b ∧ ¬ c) : a ∨ c :=
-by prop_prover
+by tab
 
 example (h₁ : a ∧ b) (h₂ : b ∧ ¬ c) : a ∧ ¬ c :=
-by prop_prover
+by tab
 
 example : ((a → b) → a) → a :=
-by prop_prover
+by tab
 
 example : (a → b) ∧ (b → c) → a → c :=
-by prop_prover
+by tab
 
 example (α : Type) (x y z w : α) :
   x = y ∧ (x = y → z = w) → z = w :=
-by prop_prover
+by tab
 
 example : ¬ (a ↔ ¬ a) :=
-by prop_prover
+by tab
